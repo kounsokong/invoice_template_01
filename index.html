@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice</title>
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 0;
+        padding: 20px;
+        color: #000;
+        background: #f0f0f0;
+    }
+
+    .invoice {
+        width: 210mm;
+        min-height: 297mm;
+        margin: auto;
+        padding: 15mm;
+        box-sizing: border-box;
+        background: white;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .header {
+        width: 100%;
+        border-bottom: 2px solid #4caf50;
+        padding-bottom: 10px;
+    }
+
+    .header img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .title {
+        text-align: right;
+        font-size: 32px;
+        font-weight: bold;
+        margin: 20px 0 10px;
+    }
+
+    .top-section {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+    .bill-to {
+        width: 48%;
+        border: 1px solid #000;
+        padding: 10px;
+        height: 130px;
+        box-sizing: border-box;
+    }
+
+    .bill-to strong {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .qr-section {
+        width: 48%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .qr-box {
+        text-align: center;
+        font-size: 13px;
+    }
+
+    .qr-box img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .invoice-info {
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 25px;
+        font-size: 14px;
+    }
+
+    table th, table td {
+        border: 1px solid #000;
+        padding: 8px;
+    }
+
+    table th {
+        background: #ddd;
+        text-align: center;
+    }
+
+    table td {
+        vertical-align: top;
+    }
+
+    .desc {
+        height: 200px;
+    }
+
+    .right {
+        text-align: right;
+    }
+
+    .center {
+        text-align: center;
+    }
+
+    .remark {
+        margin-top: 20px;
+        font-size: 14px;
+    }
+
+    .remark span {
+        color: red;
+        font-weight: bold;
+    }
+
+    .total {
+        text-align: right;
+        font-size: 18px;
+        margin-top: 10px;
+        font-weight: bold;
+    }
+
+    .footer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 50px;
+        font-size: 14px;
+    }
+
+    .signature {
+        width: 40%;
+        text-align: center;
+    }
+
+    .signature hr {
+        margin-top: 100px;
+    }
+
+    .print-button {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        background: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 1000;
+    }
+
+    .print-button:hover {
+        background: #45a049;
+    }
+
+    @media print {
+        body {
+            margin: 0;
+            background: white;
+            padding: 0;
+        }
+
+        .invoice {
+            box-shadow: none;
+            margin: 0;
+        }
+
+        .print-button {
+            display: none;
+        }
+    }
+</style>
+</head>
+<body>
+
+<button class="print-button" onclick="window.print()">Print Invoice</button>
+
+<div class="invoice">
+
+    <!-- HEADER -->
+    <div class="header">
+        <img id="header_image" src="" alt="Invoice Header" onerror="this.style.display='none'">
+    </div>
+
+    <div class="title">Invoice</div>
+
+    <!-- BILL / QR -->
+    <div class="top-section">
+        <div class="bill-to">
+            <strong>Bill to: <span id="bill_to"></span></strong>
+            H/P : <span id="phone1"></span><br>
+            Tel : <span id="phone2"></span><br>
+            Contact Person : <span id="contact_name"></span>
+        </div>
+
+        <div class="qr-section">
+            <div class="qr-box">
+                <strong>QR_CODE:</strong><br>
+                <span id="account_name"></span><br><br>
+                <img id="qr_image" src="" alt="QR Code" onerror="this.style.display='none'">
+            </div>
+
+            <div class="invoice-info">
+                Inv # : <span id="invoice_no"></span><br>
+                Date : <span id="invoice_date"></span><br>
+                DO# : <span id="do_no"></span><br>
+                Term# : <span id="due_date"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <table>
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Description</th>
+                <th>Qty</th>
+                <th>m2</th>
+                <th>Unit Price</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody id="items-tbody">
+            <!-- Line items will be populated dynamically -->
+        </tbody>
+    </table>
+
+    <!-- REMARK -->
+    <div class="remark">
+        Remark : All Cheques must be Crossed and made payable to<br>
+        <span id="account"></span><br><br>
+    </div>
+
+    <div class="total">
+        Total Amount : <span id="subtotal"></span>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div class="signature">
+            Accepted by:
+            <hr>
+        </div>
+
+        <div class="signature">
+            Received by:
+            <hr>
+            Authorized Signature
+        </div>
+    </div>
+
+</div>
+
+<script>
+// Function to get URL parameters
+function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
+
+// Function to populate invoice data
+function populateInvoice() {
+    // Get all parameters from URL
+    const fields = [
+        'bill_to', 'phone1', 'phone2', 'contact_name', 'account_name',
+        'invoice_no', 'invoice_date', 'do_no', 'due_date',
+        'item_name', 'description', 'qty', 'm2', 'rate', 'amount',
+        'account', 'subtotal'
+    ];
+    
+    // Get header image URL
+    const headerImageUrl = getUrlParameter('header_image');
+    if (headerImageUrl) {
+        document.getElementById('header_image').src = headerImageUrl;
+    }
+    
+    // Get QR code image URL
+    const qrImageUrl = getUrlParameter('qr_image');
+    if (qrImageUrl) {
+        document.getElementById('qr_image').src = qrImageUrl;
+    }
+
+    // Populate each field
+    fields.forEach(field => {
+        const element = document.getElementById(field);
+        if (element) {
+            const value = getUrlParameter(field);
+            element.textContent = value || '';
+        }
+    });
+}
+
+// Run on page load
+window.onload = function() {
+    populateInvoice();
+    
+    // Auto-print option (uncomment if needed)
+    // setTimeout(() => window.print(), 500);
+};
+</script>
+
+</body>
+</html>
