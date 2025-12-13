@@ -209,7 +209,7 @@
 
         <div class="qr-section">
             <div class="qr-box">
-                <strong>QR_CODE:</strong><br>
+                <strong>QR CODE:</strong><br>
                 <span id="account_name"></span><br><br>
                 <img id="qr_image" src="" alt="QR Code" onerror="this.style.display='none'">
             </div>
@@ -275,27 +275,94 @@ function getUrlParameter(name) {
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 }
 
+// Function to populate line items with dynamic numbering
+function populateLineItems() {
+    const tbody = document.getElementById('items-tbody');
+    tbody.innerHTML = ''; // Clear existing rows
+    
+    // Get line items from JSON parameter
+    const lineItemsJson = getUrlParameter('line_items');
+    
+    if (lineItemsJson) {
+        try {
+            const lineItems = JSON.parse(lineItemsJson);
+            
+            if (Array.isArray(lineItems) && lineItems.length > 0) {
+                lineItems.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.className = 'desc';
+                    row.innerHTML = `
+                        <td class="center">${index + 1}</td>
+                        <td>
+                            <strong>${item.item_name || ''}</strong><br>
+                            ${item.description || ''}
+                        </td>
+                        <td class="center">${item.qty || ''}</td>
+                        <td class="center">${item.m2 || ''}</td>
+                        <td class="right">${item.rate || ''}</td>
+                        <td class="right">${item.amount || ''}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                return;
+            }
+        } catch (e) {
+            console.error('Error parsing line items JSON:', e);
+        }
+    }
+    
+    // Fallback: Check for individual parameters (item_name, item_name_2, etc.)
+    let itemIndex = 1;
+    let hasItems = false;
+    
+    while (itemIndex <= 50) {
+        const suffix = itemIndex === 1 ? '' : '_' + itemIndex;
+        const itemName = getUrlParameter('item_name' + suffix);
+        
+        // If no item found and we're past first item, break
+        if (!itemName && itemIndex > 1) break;
+        
+        // If first item exists or current item exists, add it
+        if (itemName || itemIndex === 1) {
+            const description = getUrlParameter('description' + suffix);
+            const qty = getUrlParameter('qty' + suffix);
+            const m2 = getUrlParameter('m2' + suffix);
+            const rate = getUrlParameter('rate' + suffix);
+            const amount = getUrlParameter('amount' + suffix);
+            
+            const row = document.createElement('tr');
+            row.className = 'desc';
+            row.innerHTML = `
+                <td class="center">${itemIndex}</td>
+                <td>
+                    <strong>${itemName || ''}</strong><br>
+                    ${description || ''}
+                </td>
+                <td class="center">${qty || ''}</td>
+                <td class="center">${m2 || ''}</td>
+                <td class="right">${rate || ''}</td>
+                <td class="right">${amount || ''}</td>
+            `;
+            
+            tbody.appendChild(row);
+            hasItems = true;
+            
+            // If first item and no more items, break
+            if (itemIndex === 1 && !itemName) break;
+        }
+        
+        itemIndex++;
+    }
+}
+
 // Function to populate invoice data
 function populateInvoice() {
-    // Get all parameters from URL
+    // Get all basic field parameters from URL
     const fields = [
         'bill_to', 'phone1', 'phone2', 'contact_name', 'account_name',
         'invoice_no', 'invoice_date', 'do_no', 'due_date',
-        'item_name', 'description', 'qty', 'm2', 'rate', 'amount',
         'account', 'subtotal'
     ];
-    
-    // Get header image URL
-    const headerImageUrl = getUrlParameter('header_image');
-    if (headerImageUrl) {
-        document.getElementById('header_image').src = headerImageUrl;
-    }
-    
-    // Get QR code image URL
-    const qrImageUrl = getUrlParameter('qr_image');
-    if (qrImageUrl) {
-        document.getElementById('qr_image').src = qrImageUrl;
-    }
 
     // Populate each field
     fields.forEach(field => {
@@ -305,6 +372,23 @@ function populateInvoice() {
             element.textContent = value || '';
         }
     });
+    
+    // Get and set header image URL
+    const headerImageUrl = getUrlParameter('header_image');
+    if (headerImageUrl) {
+        document.getElementById('header_image').src = headerImageUrl;
+        document.getElementById('header_image').style.display = 'block';
+    }
+    
+    // Get and set QR code image URL
+    const qrImageUrl = getUrlParameter('qr_image');
+    if (qrImageUrl) {
+        document.getElementById('qr_image').src = qrImageUrl;
+        document.getElementById('qr_image').style.display = 'block';
+    }
+    
+    // Populate line items
+    populateLineItems();
 }
 
 // Run on page load
