@@ -187,8 +187,8 @@
 </style>
 </head>
 <body>
-
-<button class="print-button" onclick="window.print()">Print Invoice</button>
+    
+<button class="print-button" id="printBtn">Print Invoice</button>
 
 <div class="invoice">
 
@@ -393,6 +393,20 @@ function populateInvoice() {
 // Run on page load
 window.onload = function() {
     populateInvoice();
+    
+    // Add print button event listener
+    const printBtn = document.getElementById('printBtn');
+    if (printBtn) {
+        printBtn.addEventListener('click', function() {
+            console.log('Print button clicked');
+            try {
+                window.print();
+            } catch (e) {
+                console.error('Print error:', e);
+                alert('Unable to print. Please use Ctrl+P (Windows) or Cmd+P (Mac)');
+            }
+        });
+    }
     
     // Auto-print option (uncomment if needed)
     // setTimeout(() => window.print(), 500);
