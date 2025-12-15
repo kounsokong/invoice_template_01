@@ -242,7 +242,8 @@
     <!-- REMARK -->
     <div class="remark">
         Remark : All Cheques must be Crossed and made payable to<br>
-        <span id="account" style="white-space: pre-wrap;"></span>
+        <span id="account" style="white-space: pre-wrap;"></span><br><br>
+        Amount in Word: <span id="amount_in_word"></span>
     </div>
 
     <div class="total">
@@ -360,7 +361,7 @@ function populateInvoice() {
     const fields = [
         'bill_to', 'phone1', 'phone2', 'contact_name', 'account_name',
         'invoice_no', 'invoice_date', 'do_no', 'due_date',
-        'account', 'subtotal'
+        'account', 'subtotal', 'amount_in_word'
     ];
 
     // Populate each field
