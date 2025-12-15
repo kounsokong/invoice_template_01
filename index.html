@@ -293,7 +293,8 @@ function populateLineItems() {
                     row.innerHTML = `
                         <td class="center">${index + 1}</td>
                         <td>
-                            <strong>${item.item_name || ''}</strong> ${item.description || ''}
+                            <strong>${item.item_name || ''}</strong> 
+                            ${item.description || ''}
                         </td>
                         <td class="center">${item.qty || ''}</td>
                         <td class="center">${item.m2 || ''}</td>
@@ -333,7 +334,7 @@ function populateLineItems() {
             row.innerHTML = `
                 <td class="center">${itemIndex}</td>
                 <td>
-                    <strong>${itemName || ''}</strong><br>
+                    <strong>${itemName || ''}</strong>
                     ${description || ''}
                 </td>
                 <td class="center">${qty || ''}</td>
